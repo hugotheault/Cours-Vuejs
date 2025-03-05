@@ -1,20 +1,20 @@
 <script setup>
 import { ref, computed } from "vue";
 
-const text = ref("");
+import PostCard from "@/components/PostCard.vue";
 
+const text = ref("");
 const trimmedText = computed(() => text.value.trim());
 
 const posts = ref([]);
-
-const revPosts = computed(() => posts.value);
-revPosts.value.sort(revPosts.value.createdAt);
+const sortedPosts = computed(() => posts.value.toSorted((a, b) => b.createdAt - a.createdAt))
 
 function addPost() {
   const newPost = {
     id: Math.random().toString(36).substring(2),
     content: trimmedText.value,
     createdAt: new Date(),
+    liked: false,
     author: {
       username: "Sylvian delhou",
       avatarUrl: "https://media1.tenor.com/m/a5RGfluwSOgAAAAd/sylvian-delhoumi.gif"
@@ -23,6 +23,19 @@ function addPost() {
   posts.value.push(newPost);
   text.value = "";
 }
+
+function deletePost(id){
+  posts.value = posts.value.filter((post) => post.id !== id)
+}
+
+
+function likePost(id){
+  const unPost = posts.value.find((post) => post.id = id);
+  if(unPost){
+    unPost.liked = !unPost.liked;
+  }
+}
+
 </script>
 
 <template>
@@ -35,86 +48,8 @@ function addPost() {
 
       <h2 v-if="!posts.length">Aucun post pour le moment</h2>
 
-      <article v-for="(post,index) in revPosts" :key="index" class="card">
-        <header>
-          <img :src="post.author.avatarUrl" alt="avatar" width="36" height="36">
-          <a>{{ post.author.username }}</a>
-        </header>
-        <p >{{ post.content }}</p>
-      </article>
+      <PostCard v-for="(post, index) in sortedPosts" :key="index" :post="post" @delete="deletePost" @like="likePost"/>
       
     </div>
   </main>
 </template>
-
-<style scoped>
-.container {
-  height: 100vh;
-  margin: 0 auto;
-  max-width: 640px;
-}
-.card {
-  background-color: var(--color-bg-secondary);
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  margin-bottom: 1rem;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1rem;
-  padding: 1rem 1.5rem;
-  width: 100%;
-}
-
-textarea {
-  background: none;
-  border: none;
-  color: var(--color-text-primary);
-  flex: 1;
-  margin-bottom: 1rem;
-  outline: none;
-  padding: 0.5rem 0;
-  resize: none;
-  field-sizing: content;
-}
-
-button {
-  align-self: flex-end;
-  background: none;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  font-size: 1rem;
-  height: 40px;
-  padding: 0 1rem;
-}
-
-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-article{
-  padding: 1rem;
-  overflow: hidden;
-}
-
-article p {
-  white-space: pre-wrap;
-}
-
-article header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-article img {
-  border-radius: 50%;
-}
-
-</style>
