@@ -200,9 +200,13 @@ a:hover {
   background: var(--color-bg-tertiary);
 }
 .active {
-  color: var(--color-accent);
+  color: rgb(98, 98, 209);
 }
 
 .spacer {
   flex: 1;
+}
+
+#trash:hover{
+  color: red;
 }
